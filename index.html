@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#15231f">
+  <title>FoglioRapido — Calcolo fogli padre</title>
+  <meta name="description" content="Calcola quanti fogli padre e fogli macchina ordinare per la tua tiratura di stampa.">
+  <style>
+    :root{--ink:#15231f;--paper:#f3efe5;--card:#fffdf7;--lime:#d9f45b;--line:#d6d1c6}
+    *{box-sizing:border-box}html{background:var(--paper)}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}input{font:inherit}main{min-height:100vh}
+    .topbar{max-width:1180px;margin:auto;padding:28px 28px 10px;display:flex;align-items:center;gap:12px}.brand-mark{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--lime);font-weight:900;font-size:22px}.eyebrow{margin:0 0 2px;font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;opacity:.55}h1{margin:0;font-size:19px;letter-spacing:-.04em}
+    .intro{max-width:1180px;margin:auto;padding:58px 28px 42px;position:relative}.kicker{font-size:11px;font-weight:900;letter-spacing:.16em;margin:0 0 18px}h2{font-size:clamp(52px,8vw,106px);line-height:.85;letter-spacing:-.07em;margin:0;max-width:850px}.lead{position:absolute;right:30px;bottom:48px;width:290px;line-height:1.5;font-size:15px;margin:0}
+    .workspace{max-width:1180px;margin:0 auto;padding:0 28px 50px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:stretch}.panel,.result{border-radius:20px;padding:34px}.panel{background:var(--card);border:1px solid rgba(21,35,31,.08)}.result{background:var(--ink);color:white;display:flex;flex-direction:column}.section-heading{display:flex;gap:16px;align-items:center;margin-bottom:26px}.section-heading>span{background:var(--lime);color:var(--ink);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900}.section-heading h3{margin:0 0 3px;font-size:19px}.section-heading p{margin:0;color:#777;font-size:12px}.section-heading.compact{margin-bottom:18px}.divider{border-top:1px solid var(--line);margin:30px 0}fieldset{border:0;padding:0;margin:0 0 22px}legend,.single-field>span{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}.pair{display:grid;grid-template-columns:1fr 24px 1fr;align-items:end;gap:8px}.pair em{font-style:normal;text-align:center;padding-bottom:16px;color:#999}label>span{display:block;color:#666;font-size:11px;margin-bottom:6px}label>div{display:flex;align-items:center;background:#f3f0e8;border:1px solid transparent;border-radius:10px;transition:.2s}label>div:focus-within{border-color:var(--ink);background:white}input{width:100%;min-width:0;border:0;outline:0;padding:13px 5px 13px 14px;background:transparent;font-size:20px;font-weight:750;color:var(--ink)}label b{padding-right:13px;font-size:11px;color:#777}.single-field{display:block;margin-bottom:12px}
+    .result-topline{display:flex;justify-content:space-between;align-items:center;gap:12px}.result-label{color:var(--lime);font-size:11px;letter-spacing:.17em;font-weight:900}.readonly-badge{padding:6px 9px;border:1px solid rgba(255,255,255,.22);border-radius:99px;font-size:8px;letter-spacing:.12em;color:rgba(255,255,255,.58)}.order-results{display:grid;grid-template-columns:1fr 150px;gap:18px;align-items:end;margin:26px 0 28px}.big-number{font-size:clamp(70px,8vw,112px);line-height:.86;letter-spacing:-.08em;font-weight:850}.unit{font-size:11px;font-weight:800;letter-spacing:.1em;opacity:.7;margin-top:9px}.parent-order{background:var(--lime);color:var(--ink);padding:16px;border-radius:12px}.parent-order span{display:block;font-size:8px;line-height:1.35;font-weight:900;letter-spacing:.1em}.parent-order strong{display:block;font-size:36px;letter-spacing:-.06em;line-height:1;margin:10px 0 6px}.parent-order small{display:block;font-size:9px;opacity:.65}.cut-visual{width:170px;aspect-ratio:1.45;border:2px solid rgba(255,255,255,.65);padding:7px;display:grid;gap:5px;transform:rotate(-2deg);margin:4px 0 24px}.cut-visual i{display:block;min-height:18px;background:var(--lime);border-radius:2px}.orientation{font-size:13px;line-height:1.6;margin:auto 0 22px;color:rgba(255,255,255,.7)}.orientation strong{color:white}dl{border-top:1px solid rgba(255,255,255,.18);margin:0;padding-top:13px}dl div{display:flex;justify-content:space-between;gap:15px;padding:7px 0;font-size:12px}dt{color:rgba(255,255,255,.62)}dd{margin:0;font-weight:800;text-align:right}.error{margin:auto 0;font-size:22px;line-height:1.35;max-width:330px}footer{max-width:1180px;margin:auto;padding:0 28px 35px;font-size:11px;color:#777}
+    @media(max-width:800px){.intro{padding-top:38px}.lead{position:static;width:auto;max-width:450px;margin-top:25px}.workspace{grid-template-columns:1fr}.result{min-height:520px}}
+    @media(max-width:480px){.topbar,.intro,.workspace,footer{padding-left:18px;padding-right:18px}.intro{padding-bottom:30px}h2{font-size:55px}.panel,.result{padding:24px;border-radius:16px}.pair{grid-template-columns:1fr 14px 1fr;gap:4px}input{font-size:18px;padding-left:10px}.order-results{grid-template-columns:1fr 130px;gap:10px}.parent-order{padding:13px}.parent-order strong{font-size:30px}}
+  </style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="brand-mark">F</div><div><p class="eyebrow">Strumento di produzione</p><h1>FoglioRapido</h1></div></header>
+  <section class="intro"><p class="kicker">CALCOLO TAGLIO · IN TEMPO REALE</p><h2>Dal foglio padre<br>alla macchina.</h2><p class="lead">Inserisci formati e tiratura. Il calcolatore trova automaticamente l’orientamento migliore e ti dice quanti fogli ordinare.</p></section>
+  <section class="workspace">
+    <form class="panel" id="calculator">
+      <div class="section-heading"><span>01</span><div><h3>Formati</h3><p>Misure in centimetri</p></div></div>
+      <fieldset><legend>Foglio padre</legend><div class="pair">
+        <label><span>Larghezza</span><div><input id="pw" inputmode="decimal" value="70" aria-label="Larghezza foglio padre"><b>cm</b></div></label><em>×</em>
+        <label><span>Altezza</span><div><input id="ph" inputmode="decimal" value="100" aria-label="Altezza foglio padre"><b>cm</b></div></label>
+      </div></fieldset>
+      <fieldset><legend>Foglio macchina</legend><div class="pair">
+        <label><span>Larghezza</span><div><input id="mw" inputmode="decimal" value="33" aria-label="Larghezza foglio macchina"><b>cm</b></div></label><em>×</em>
+        <label><span>Altezza</span><div><input id="mh" inputmode="decimal" value="48" aria-label="Altezza foglio macchina"><b>cm</b></div></label>
+      </div></fieldset>
+      <div class="divider"></div>
+      <div class="section-heading compact"><span>02</span><div><h3>Tiratura</h3><p>Fogli macchina necessari</p></div></div>
+      <label class="single-field"><span>Quantità da stampare</span><div><input id="qty" inputmode="numeric" value="1000" aria-label="Quantità da stampare"><b>fogli</b></div></label>
+      <label class="single-field"><span>Scarto / avviamento</span><div><input id="waste" inputmode="decimal" value="3" aria-label="Scarto o avviamento"><b>%</b></div></label>
+    </form>
+    <aside class="result" aria-live="polite">
+      <div class="result-topline"><div class="result-label">RISULTATO ORDINE</div><span class="readonly-badge">SOLO LETTURA</span></div>
+      <div id="valid-result">
+        <div class="order-results"><div><div class="big-number" id="machine-order">1030</div><div class="unit">FOGLI MACCHINA DA ORDINARE</div></div>
+          <div class="parent-order"><span>FOGLI PADRE DA ORDINARE</span><strong id="parent-order">258</strong><small id="waste-note">incluso il 3% di scarto</small></div>
+        </div>
+        <div class="cut-visual" id="cut-visual" aria-label="2 colonne per 2 righe"></div>
+        <p class="orientation"><strong><span id="yield">4</span> fogli macchina</strong> per ogni padre<br><span id="layout">2 × 2 · orientamento diretto</span></p>
+        <dl><div><dt>Fogli padre senza scarto</dt><dd id="net-parents">250</dd></div><div><dt>Fogli macchina effettivamente ottenuti</dt><dd id="produced">1032</dd></div><div><dt>Eccedenza dovuta all’arrotondamento</dt><dd id="extra">+2</dd></div></dl>
+      </div>
+      <div class="error" id="error" hidden>Il foglio macchina non entra nel foglio padre. Controlla le misure.</div>
+    </aside>
+  </section>
+  <footer>Il calcolo considera una disposizione a griglia e permette la rotazione di 90°. Inserisci nelle misure eventuali margini di pinza o rifilo.</footer>
+</main>
+<script>
+  const ids=["pw","ph","mw","mh","qty","waste"];
+  const el=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
+  const out=id=>document.getElementById(id);
+  const fmt=new Intl.NumberFormat("it-IT",{maximumFractionDigits:0});
+  const positive=v=>{const n=Number(String(v).replace(",","."));return Number.isFinite(n)&&n>0?n:0};
+  function calculate(){
+    const pw=positive(el.pw.value),ph=positive(el.ph.value),mw=positive(el.mw.value),mh=positive(el.mh.value);
+    const qty=Math.ceil(positive(el.qty.value)),waste=Math.max(0,positive(el.waste.value));
+    const normal={columns:mw?Math.floor(pw/mw):0,rows:mh?Math.floor(ph/mh):0,rotated:false};
+    const rotated={columns:mh?Math.floor(pw/mh):0,rows:mw?Math.floor(ph/mw):0,rotated:true};
+    const best=normal.columns*normal.rows>=rotated.columns*rotated.rows?normal:rotated;
+    const yieldPerParent=best.columns*best.rows,valid=pw>0&&ph>0&&mw>0&&mh>0&&yieldPerParent>0;
+    out("valid-result").hidden=!valid;out("error").hidden=valid;if(!valid)return;
+    const machineToOrder=Math.ceil(qty*(1+waste/100));
+    const netParents=Math.ceil(qty/yieldPerParent),parentOrder=Math.ceil(machineToOrder/yieldPerParent),produced=parentOrder*yieldPerParent;
+    out("machine-order").textContent=fmt.format(machineToOrder);out("parent-order").textContent=fmt.format(parentOrder);
+    out("waste-note").textContent=`incluso il ${el.waste.value||"0"}% di scarto`;out("yield").textContent=yieldPerParent;
+    out("layout").textContent=`${best.columns} × ${best.rows} · ${best.rotated?"formato ruotato":"orientamento diretto"}`;
+    out("net-parents").textContent=fmt.format(netParents);out("produced").textContent=fmt.format(produced);out("extra").textContent=`+${fmt.format(Math.max(0,produced-machineToOrder))}`;
+    const visual=out("cut-visual");visual.style.gridTemplateColumns=`repeat(${best.columns},1fr)`;visual.setAttribute("aria-label",`${best.columns} colonne per ${best.rows} righe`);
+    visual.replaceChildren(...Array.from({length:Math.min(yieldPerParent,24)},()=>document.createElement("i")));
+  }
+  document.getElementById("calculator").addEventListener("input",calculate);
+  document.getElementById("calculator").addEventListener("submit",e=>e.preventDefault());
+  calculate();
+</script>
+</body>
+</html>
