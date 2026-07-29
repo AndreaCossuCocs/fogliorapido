@@ -18,6 +18,7 @@
     .select-grid,.manual-grid,.readonly-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.select-field{display:block;margin-bottom:12px;min-width:0}.select-field>span{display:block;color:var(--ink);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}.select-field>div{display:flex;align-items:center;min-height:50px;background:#f3f0e8;border:1px solid transparent;border-radius:10px}.select-field select{width:100%;min-width:0;border:0;outline:0;padding:14px;background:transparent;color:var(--ink);font-weight:750}.mode-switch{display:inline-flex;gap:3px;margin:12px 0 20px;padding:3px;border-radius:99px;background:#ece8df}.mode-switch button{padding:8px 12px}.mode-switch button.active{background:#fff;box-shadow:0 1px 5px rgba(21,35,31,.08)}
     .readonly-grid{margin:2px 0 10px}.readonly-datum{position:relative;padding:13px 14px;border:1px solid #e2ded4;border-radius:10px;background:#efebe3}.readonly-datum:after{content:"BLOCCATO";position:absolute;top:10px;right:10px;color:#9d9a92;font-size:7px;font-weight:900;letter-spacing:.1em}.readonly-datum span{display:block;margin-bottom:7px;color:#777;font-size:9px;font-weight:800;letter-spacing:.08em}.readonly-datum strong{font-size:21px}.readonly-datum small{margin-left:5px;color:#777;font-size:10px}.source-note,.binding-note{margin:0;color:#88857e;font-size:10px;line-height:1.45}.binding-note{margin-top:-3px}.divider.small{margin:22px 0}
     .spine-workspace{grid-template-columns:1.12fr .88fr}.spine-result{min-height:620px}.spine-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin:54px 0 38px}.paper-ticket{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px;padding:16px;border-radius:12px;background:var(--lime);color:var(--ink)}.paper-ticket span{display:block;font-size:8px;font-weight:900;letter-spacing:.1em}.paper-ticket strong{display:block;margin-top:5px;font-size:28px;letter-spacing:-.04em}.paper-ticket small{max-width:180px;opacity:.7;font-size:9px;line-height:1.5;text-align:right}.copy-result{align-self:flex-start;margin-top:auto;padding:10px 15px;border:1px solid rgba(255,255,255,.28);border-radius:99px;background:transparent;color:#fff;cursor:pointer;font-size:10px;font-weight:800}.copy-result:hover{border-color:var(--lime);color:var(--lime)}
+    .measurement-box{margin-top:18px;padding:16px;border:1px solid rgba(21,35,31,.15);border-radius:12px;background:rgba(217,244,91,.16)}.measurement-box .single-field{margin-bottom:7px}.result-range{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-bottom:24px;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(255,255,255,.18)}.result-range div{padding:12px 10px;background:var(--ink);text-align:center}.result-range .nominal{background:rgba(217,244,91,.12)}.result-range span{display:block;margin-bottom:5px;color:rgba(255,255,255,.52);font-size:7px;font-weight:900;letter-spacing:.1em}.result-range .nominal span{color:var(--lime)}.result-range strong{font-size:18px;letter-spacing:-.03em}.result-range small{margin-left:3px;color:rgba(255,255,255,.5);font-size:8px}
     @media(max-width:800px){.intro{padding-top:38px}.lead{position:static;width:auto;max-width:450px;margin-top:25px}.workspace,.spine-workspace{grid-template-columns:1fr}.result{min-height:520px}.topbar{flex-wrap:wrap}.tool-nav{width:100%;margin:12px 0 0}.tool-nav button{flex:1}}
     @media(max-width:600px){.binding-grid{grid-template-columns:1fr}.binding-grid button{min-height:auto;display:flex;gap:12px;align-items:center}.binding-grid button:before{margin:0}.select-grid{grid-template-columns:1fr;gap:0}}
     @media(max-width:480px){.topbar,.intro,.workspace,footer{padding-left:18px;padding-right:18px}.intro{padding-bottom:30px}h2{font-size:53px}.panel,.result{padding:24px;border-radius:16px}.pair{grid-template-columns:1fr 14px 1fr;gap:4px}input{font-size:18px;padding-left:10px}.order-results{grid-template-columns:1fr 130px;gap:10px}.parent-order{padding:13px}.parent-order strong{font-size:30px}.paper-ticket{align-items:flex-start;flex-direction:column}.paper-ticket small{text-align:left}}
@@ -95,8 +96,15 @@
           <label class="single-field"><span>Spessore dichiarato — facoltativo</span><div><input id="manual-caliper" inputmode="decimal" placeholder="120"><b>µm</b></div></label>
           <p class="source-note">Se inserisci i micron dichiarati, questi hanno priorità sul calcolo da VSA.</p>
         </div>
+        <div class="measurement-box">
+          <label class="single-field"><span>Spessore misurato su 100 fogli — facoltativo</span><div><input id="measured-stack" inputmode="decimal"><b>mm</b></div></label>
+          <p class="source-note">Se presente, sostituisce lo spessore teorico. Misura la pila senza copertina e senza comprimerla oltre la normale pressione del micrometro.</p>
+        </div>
         <div class="divider small"></div>
-        <label class="single-field"><span id="correction-label">Correzione legatoria — facoltativa</span><div><input id="correction" inputmode="decimal" value="0"><b>mm</b></div></label>
+        <div class="manual-grid">
+          <label class="single-field"><span id="correction-label">Correzione legatoria — facoltativa</span><div><input id="correction" inputmode="decimal" value="0"><b>mm</b></div></label>
+          <label class="single-field"><span>Margine di sicurezza</span><div><input id="safety-margin" inputmode="decimal" value="3"><b>%</b></div></label>
+        </div>
         <p class="binding-note" id="binding-note"></p>
       </form>
       <aside class="result spine-result" aria-live="polite">
@@ -104,7 +112,8 @@
         <div id="spine-valid">
           <div class="spine-hero"><div><div class="big-number" id="spine-final">9,76</div><div class="unit">MILLIMETRI</div></div></div>
           <div class="paper-ticket"><div><span>BLOCCO CARTA</span><strong id="spine-block">9,76 mm</strong></div><small id="paper-summary"></small></div>
-          <dl><div><dt>Rilegatura</dt><dd id="binding-summary"></dd></div><div><dt>Fogli nel blocco</dt><dd id="leaves"></dd></div><div><dt>Spessore singolo foglio</dt><dd id="single-caliper"></dd></div><div><dt>Correzione applicata</dt><dd id="correction-summary"></dd></div></dl>
+          <div class="result-range"><div><span>MINIMO</span><strong id="spine-minimum"></strong><small>mm</small></div><div class="nominal"><span>NOMINALE</span><strong id="spine-nominal"></strong><small>mm</small></div><div><span>MASSIMO</span><strong id="spine-maximum"></strong><small>mm</small></div></div>
+          <dl><div><dt>Rilegatura</dt><dd id="binding-summary"></dd></div><div><dt>Fogli nel blocco</dt><dd id="leaves"></dd></div><div><dt>Spessore singolo foglio</dt><dd id="single-caliper"></dd></div><div><dt>Origine dello spessore</dt><dd id="thickness-source"></dd></div><div><dt>Correzione applicata</dt><dd id="correction-summary"></dd></div><div><dt>Margine prudenziale</dt><dd id="safety-summary"></dd></div></dl>
           <button class="copy-result" type="button" id="copy-spine">Copia misura</button>
         </div>
         <div class="error" id="spine-error" hidden>Inserisci un numero pari di pagine e valori carta validi.</div>
@@ -206,12 +215,15 @@
       out("source-note").textContent=`Dato principale: ${spec.source==="Spessore"?"spessore ISO 534":"VSA ISO 534"} · scheda tecnica ${paper.name}`;
     }
     const pages=Math.floor(positive(out("pages").value)),leaves=pages/2,correction=Math.max(0,positive(out("correction").value));
-    const block=leaves*spec.caliper/1000,final=block+correction,valid=pages>0&&pages%2===0&&spec.caliper>0;
+    const measured=positive(out("measured-stack").value),effectiveCaliper=measured?measured*10:spec.caliper,safety=Math.max(0,positive(out("safety-margin").value))/100;
+    const block=leaves*effectiveCaliper/1000,final=block+correction,minimum=block*(1-safety)+correction,maximum=block*(1+safety)+correction,valid=pages>0&&pages%2===0&&effectiveCaliper>0;
     out("spine-valid").hidden=!valid;out("spine-error").hidden=valid;if(!valid)return;
     out("spine-final").textContent=dec.format(final);out("spine-block").textContent=`${dec.format(block)} mm`;
+    out("spine-minimum").textContent=dec.format(minimum);out("spine-nominal").textContent=dec.format(final);out("spine-maximum").textContent=dec.format(maximum);
     out("paper-summary").innerHTML=`${summary}<br>${fmt.format(spec.gsm)} g/m² · VSA ${dec.format(spec.vsa)}`;
     out("binding-summary").textContent=bindingData[binding].title;out("leaves").textContent=fmt.format(leaves);
-    out("single-caliper").textContent=`${fmt.format(spec.caliper)} µm`;out("correction-summary").textContent=`+${dec.format(correction)} mm`;
+    out("single-caliper").textContent=`${fmt.format(effectiveCaliper)} µm`;out("thickness-source").textContent=measured?"Misura su 100 fogli":"Scheda tecnica";
+    out("correction-summary").textContent=`+${dec.format(correction)} mm`;out("safety-summary").textContent=`±${dec.format(safety*100)}%`;
   }
   millSelect.addEventListener("change",fillPapers);paperSelect.addEventListener("change",fillSpecs);gsmSelect.addEventListener("change",calculateSpine);
   out("spine-calculator").addEventListener("input",calculateSpine);out("spine-calculator").addEventListener("submit",e=>e.preventDefault());
@@ -225,7 +237,7 @@
     out("catalog-mode").classList.toggle("active",!manual);out("manual-mode").classList.toggle("active",manual);calculateSpine();
   }
   out("catalog-mode").addEventListener("click",()=>setMode(false));out("manual-mode").addEventListener("click",()=>setMode(true));
-  out("copy-spine").addEventListener("click",async()=>{await navigator.clipboard?.writeText(`${out("spine-final").textContent} mm`);out("copy-spine").textContent="Copiato";setTimeout(()=>out("copy-spine").textContent="Copia misura",1400)});
+  out("copy-spine").addEventListener("click",async()=>{await navigator.clipboard?.writeText(`${out("spine-final").textContent} mm · intervallo ${out("spine-minimum").textContent}–${out("spine-maximum").textContent} mm`);out("copy-spine").textContent="Copiato";setTimeout(()=>out("copy-spine").textContent="Copia misura",1400)});
   out("binding-note").textContent=bindingData.fresata.note;
   fillPapers();
 </script>
