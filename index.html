@@ -120,7 +120,6 @@
         <div class="section-heading"><span>01</span><div><h3>Rilegatura</h3><p>Tipo di confezione</p></div></div>
         <div class="binding-grid" id="bindings">
           <div class="binding-option active"><button type="button" class="binding-choice" data-binding="fresata">Brossura fresata</button><button type="button" class="binding-info" data-binding-info="fresata" aria-label="Informazioni su Brossura fresata">i</button></div>
-          <div class="binding-option"><button type="button" class="binding-choice" data-binding="cucita">Brossura cucita</button><button type="button" class="binding-info" data-binding-info="cucita" aria-label="Informazioni su Brossura cucita">i</button></div>
         </div>
         <div class="binding-explanation" id="binding-explanation" hidden><strong id="binding-explanation-title"></strong><p id="binding-explanation-text"></p></div>
         <div class="divider"></div>
@@ -290,7 +289,6 @@
   ];
   const bindingData={
     fresata:{title:"Brossura fresata",label:"Correzione legatoria",note:"Il dorso nominale coincide con il blocco carta. Aggiungi solo l’eventuale tolleranza indicata dalla legatoria.",detail:"Le pagine vengono raccolte in un blocco; il dorso viene fresato e irruvidito, poi incollato direttamente alla copertina con colla PUR o EVA. È la soluzione più comune e conveniente per libri e cataloghi."},
-    cucita:{title:"Brossura cucita",label:"Maggiorazione cucitura",note:"La cucitura può gonfiare le segnature. Inserisci qui la maggiorazione concordata con la legatoria.",detail:"I fogli vengono piegati in segnature, cuciti tra loro con filo e infine incollati alla copertina. È più resistente della fresata e si apre meglio, ma la cucitura può aumentare leggermente il dorso."},
   };
   const dec=new Intl.NumberFormat("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2});
   const oneDec=new Intl.NumberFormat("it-IT",{maximumFractionDigits:1});
