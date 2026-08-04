@@ -81,8 +81,7 @@
         <div class="book-method">
           <span>Metodo di allestimento</span>
           <div class="mode-switch" role="group" aria-label="Metodo di allestimento del libro">
-            <button type="button" id="book-fresata" class="active">Brossura fresata</button>
-            <button type="button" id="book-signatures">A segnature</button>
+            <button type="button" id="book-fresata" class="active" disabled>Brossura fresata</button>
           </div>
         </div>
         <div class="manual-grid">
@@ -93,8 +92,6 @@
         <p class="input-explainer">Numero totale di facciate ottenute considerando fronte e retro.</p>
         <p class="calculation-preview" id="book-paper-calculation">160 facciate × 1.000 copie ÷ 16 facciate/foglio = 10.000 fogli macchina netti</p>
         <p class="calculation-warning" id="book-pages-warning" hidden>Il numero di facciate deve essere pari per la stampa fronte e retro.</p>
-        <p class="calculation-warning" id="book-signature-pages-warning" hidden>Per le segnature verifica la paginazione: le facciate non sono multiple di 4.</p>
-        <p class="calculation-warning" id="book-signature-warning" hidden>L’ultima segnatura non è completa: conferma l’imposizione con la prestampa.</p>
       </div>
       <label class="single-field"><span>Scarto / avviamento</span><div><input id="waste" inputmode="decimal" value="3" aria-label="Scarto o avviamento"><b>%</b></div></label>
     </form>
@@ -192,29 +189,21 @@
   out("parent-calculator").addEventListener("input",calculateParentToMachine);
   out("parent-calculator").addEventListener("submit",e=>e.preventDefault());
   calculateParentToMachine();
-  let quantityMode="sheets",bookAssembly="fresata";
+  let quantityMode="sheets";
   function calculate(){
     const pw=positive(el.pw.value),ph=positive(el.ph.value),mw=positive(el.mw.value),mh=positive(el.mh.value);
     const pageCount=Math.floor(positive(el["book-pages"].value)),copies=Math.ceil(positive(el["book-copies"].value)),imposedPages=Math.floor(positive(el["book-pages-per-sheet"].value));
-    const sheetsPerCopy=imposedPages?Math.ceil(pageCount/imposedPages):0;
-    const optimizedBookQuantity=imposedPages?Math.ceil(pageCount*copies/imposedPages):0,signatureBookQuantity=sheetsPerCopy*copies;
-    const bookQuantity=bookAssembly==="fresata"?optimizedBookQuantity:signatureBookQuantity;
+    const bookQuantity=imposedPages?Math.ceil(pageCount*copies/imposedPages):0;
     const qty=quantityMode==="book"?bookQuantity:Math.ceil(positive(el.qty.value)),waste=Math.max(0,positive(el.waste.value));
     const normal={columns:mw?Math.floor(pw/mw):0,rows:mh?Math.floor(ph/mh):0,rotated:false};
     const rotated={columns:mh?Math.floor(pw/mh):0,rows:mw?Math.floor(ph/mw):0,rotated:true};
     const best=normal.columns*normal.rows>=rotated.columns*rotated.rows?normal:rotated;
     const yieldPerParent=best.columns*best.rows,valid=pw>0&&ph>0&&mw>0&&mh>0&&yieldPerParent>0&&qty>0&&(quantityMode!=="book"||pageCount%2===0);
     out("book-paper-calculation").textContent=bookQuantity>0
-      ?bookAssembly==="fresata"
-        ?`${fmt.format(pageCount)} facciate × ${fmt.format(copies)} copie ÷ ${fmt.format(imposedPages)} facciate/foglio = ${fmt.format(bookQuantity)} fogli macchina netti`
-        :`${fmt.format(pageCount)} facciate ÷ ${fmt.format(imposedPages)} = ${fmt.format(sheetsPerCopy)} segnature/copia × ${fmt.format(copies)} copie = ${fmt.format(bookQuantity)} fogli macchina netti`
+      ?`${fmt.format(pageCount)} facciate × ${fmt.format(copies)} copie ÷ ${fmt.format(imposedPages)} facciate/foglio = ${fmt.format(bookQuantity)} fogli macchina netti`
       :"Inserisci facciate, copie e facciate ricavate da ogni foglio macchina.";
     const pageWarning=pageCount>0&&pageCount%2!==0;
     out("book-pages-warning").hidden=!pageWarning;
-    const signaturePagesWarning=bookAssembly==="signatures"&&pageCount>0&&pageCount%4!==0;
-    out("book-signature-pages-warning").hidden=!signaturePagesWarning;
-    const signatureWarning=bookAssembly==="signatures"&&pageCount>0&&imposedPages>0&&pageCount%imposedPages!==0;
-    out("book-signature-warning").hidden=!signatureWarning;
     out("valid-result").hidden=!valid;out("error").hidden=valid;if(!valid)return;
     const machineToOrder=Math.ceil(qty*(1+waste/100));
     const netParents=Math.ceil(qty/yieldPerParent),parentOrder=Math.ceil(machineToOrder/yieldPerParent),produced=parentOrder*yieldPerParent;
@@ -235,14 +224,6 @@
   }
   out("quantity-sheets").addEventListener("click",()=>setQuantityMode("sheets"));
   out("quantity-book").addEventListener("click",()=>setQuantityMode("book"));
-  function setBookAssembly(mode){
-    bookAssembly=mode;
-    out("book-fresata").classList.toggle("active",mode==="fresata");
-    out("book-signatures").classList.toggle("active",mode==="signatures");
-    calculate();
-  }
-  out("book-fresata").addEventListener("click",()=>setBookAssembly("fresata"));
-  out("book-signatures").addEventListener("click",()=>setBookAssembly("signatures"));
   document.getElementById("calculator").addEventListener("input",calculate);
   document.getElementById("calculator").addEventListener("submit",e=>e.preventDefault());
   calculate();
